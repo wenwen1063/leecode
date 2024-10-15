@@ -6,14 +6,15 @@
 
 // @lc code=start
 func removeElement(nums []int, val int) int {
-	var arr []int
-	for i := 0; i < len(nums); i++ {
-		if nums[i] != val {
-			arr = append(arr, nums[i])
+	//双指针，快慢指针
+	slow := 0
+	for fast := 0; fast < len(nums); fast++ {
+		if nums[fast] != val {
+			nums[slow] = nums[fast]
+			slow++
 		}
 	}
-	copy(nums, arr)
-	return len(arr)
+	return slow
 }
 
 // @lc code=end
