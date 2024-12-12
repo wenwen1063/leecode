@@ -1,0 +1,28 @@
+/*
+ * @lc app=leetcode.cn id=633 lang=golang
+ *
+ * [633] 平方数之和
+ */
+
+// @lc code=start
+func judgeSquareSum(c int) bool {
+	//双指针
+	//先需要通过数学公式，找到平方根，减少时间,俩个指针从两端向中间移动，相加判断是否满足条件
+	left := 0
+	right := int(math.Sqrt(float64(c))) // 平方根
+
+	for left <= right {
+		sum := left*left + right*right
+		if sum == c {
+			return true
+		} else if sum > c {
+			right--
+		} else {
+			left++
+		}
+	}
+	return false
+}
+
+// @lc code=end
+
