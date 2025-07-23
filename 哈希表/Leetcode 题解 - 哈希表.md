@@ -27,17 +27,18 @@
 
 用 HashMap 存储数组元素和索引的映射，在访问到 nums[i] 时，判断 HashMap 中是否存在 target - nums[i]，如果存在说明 target - nums[i] 所在的索引和 i 就是要找的两个数。该方法的时间复杂度为 O(N)，空间复杂度为 O(N)，使用空间来换取时间。
 
-```java
-public int[] twoSum(int[] nums, int target) {
-    HashMap<Integer, Integer> indexForNum = new HashMap<>();
-    for (int i = 0; i < nums.length; i++) {
-        if (indexForNum.containsKey(target - nums[i])) {
-            return new int[]{indexForNum.get(target - nums[i]), i};
-        } else {
-            indexForNum.put(nums[i], i);
-        }
-    }
-    return null;
+```go
+func twoSum(nums []int, target int) []int {
+	//哈希表
+	var res map[int]int = make(map[int]int)
+	for i := 0; i < len(nums); i++ {
+		if _, ok := res[nums[i]]; ok {
+			return []int{res[nums[i]], i}
+		} else {
+			res[target-nums[i]] = i
+		}
+	}
+	return nil
 }
 ```
 
@@ -47,13 +48,17 @@ public int[] twoSum(int[] nums, int target) {
 
 [Leetcode](https://leetcode.com/problems/contains-duplicate/description/) / [力扣](https://leetcode-cn.com/problems/contains-duplicate/description/)
 
-```java
-public boolean containsDuplicate(int[] nums) {
-    Set<Integer> set = new HashSet<>();
-    for (int num : nums) {
-        set.add(num);
-    }
-    return set.size() < nums.length;
+```go
+func containsDuplicate(nums []int) bool {
+	//哈希表
+	var res map[int]int = make(map[int]int)
+	for i := 0; i < len(nums); i++ {
+		if _, ok := res[nums[i]]; ok {
+			return true
+		}
+		res[nums[i]] = 1
+	}
+	return false
 }
 ```
 
@@ -71,19 +76,20 @@ Explanation: The longest harmonious subsequence is [3,2,2,2,3].
 
 和谐序列中最大数和最小数之差正好为 1，应该注意的是序列的元素不一定是数组的连续元素。
 
-```java
-public int findLHS(int[] nums) {
-    Map<Integer, Integer> countForNum = new HashMap<>();
-    for (int num : nums) {
-        countForNum.put(num, countForNum.getOrDefault(num, 0) + 1);
-    }
-    int longest = 0;
-    for (int num : countForNum.keySet()) {
-        if (countForNum.containsKey(num + 1)) {
-            longest = Math.max(longest, countForNum.get(num + 1) + countForNum.get(num));
-        }
-    }
-    return longest;
+```go
+func findLHS(nums []int) int {
+	//哈希表 先把所以的值统计到哈希表中，然后在判断有多少值【浮动一】
+	res := map[int]int{}
+	for _, v := range nums {
+		res[v]++
+	}
+	ans := 0
+	for k, v := range res {
+		if c1 := res[k+1]; c1 > 0 && v+c1 > ans {
+			ans = v + c1
+		}
+	}
+	return ans
 }
 ```
 
@@ -100,36 +106,28 @@ The longest consecutive elements sequence is [1, 2, 3, 4]. Return its length: 4.
 
 要求以 O(N) 的时间复杂度求解。
 
-```java
-public int longestConsecutive(int[] nums) {
-    Map<Integer, Integer> countForNum = new HashMap<>();
-    for (int num : nums) {
-        countForNum.put(num, 1);
-    }
-    for (int num : nums) {
-        forward(countForNum, num);
-    }
-    return maxCount(countForNum);
-}
+```go
+func longestConsecutive(nums []int) int {
+	//哈希表
+	res := map[int]bool{}
+	for _, v := range nums {
+		res[v] = true
+	}
 
-private int forward(Map<Integer, Integer> countForNum, int num) {
-    if (!countForNum.containsKey(num)) {
-        return 0;
-    }
-    int cnt = countForNum.get(num);
-    if (cnt > 1) {
-        return cnt;
-    }
-    cnt = forward(countForNum, num + 1) + 1;
-    countForNum.put(num, cnt);
-    return cnt;
-}
-
-private int maxCount(Map<Integer, Integer> countForNum) {
-    int max = 0;
-    for (int num : countForNum.keySet()) {
-        max = Math.max(max, countForNum.get(num));
-    }
-    return max;
+	ans := 0
+	for k, _ := range res {
+		if !res[k-1] { //判断前面是否存在，确定是否是连续中第一个
+			count := 1   //计数
+			current := k //判断当前是那个数
+			for res[current+1] {
+				count++
+				current++
+			}
+			if count > ans {
+				ans = count
+			}
+		}
+	}
+	return ans
 }
 ```
